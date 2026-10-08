@@ -1,35 +1,33 @@
-```javascript
-self.addEventListener("install", event => {
+self.addEventListener("install", function(event) {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", event => {
+self.addEventListener("activate", function(event) {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("push", event => {
+self.addEventListener("push", function(event) {
 
-  let data = {};
+  var data = {
+    title: "🔔 Rundown Reminder",
+    body: "Ada pengingat baru."
+  };
 
-  try {
-    data = event.data.json();
-  } catch (e) {
-    data = {
-      title: "🔔 Rundown Reminder",
-      body: event.data ? event.data.text() : "Ada pengingat baru."
-    };
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text();
+    }
   }
 
   event.waitUntil(
-    self.registration.showNotification(
-      data.title || "🔔 Rundown Reminder",
-      {
-        body: data.body || "Ada pengingat baru.",
-        icon: "icon-192.png",
-        badge: "icon-192.png"
-      }
-    )
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "ikon.png",
+      badge: "ikon.png"
+    })
   );
 
 });
-```
+
