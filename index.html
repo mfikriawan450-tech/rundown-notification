@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Rundown Reminder</title>
 
   <link rel="manifest" href="manifest.json">
@@ -20,6 +21,35 @@
   </button>
 
   <p id="status">Status: belum aktif</p>
+
+  <script>
+    const button = document.getElementById("btnNotify");
+    const status = document.getElementById("status");
+
+    button.addEventListener("click", async () => {
+
+      if (!("Notification" in window)) {
+        status.textContent =
+          "Browser tidak mendukung notifikasi.";
+        return;
+      }
+
+      const permission =
+        await Notification.requestPermission();
+
+      if (permission === "granted") {
+        status.textContent =
+          "✅ Notifikasi sudah diizinkan.";
+      } else if (permission === "denied") {
+        status.textContent =
+          "❌ Notifikasi ditolak.";
+      } else {
+        status.textContent =
+          "⚠️ Izin notifikasi belum diberikan.";
+      }
+
+    });
+  </script>
 
 </body>
 </html>
