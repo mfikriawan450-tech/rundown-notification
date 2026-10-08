@@ -21,6 +21,13 @@
 
   <p id="status">Status: belum aktif</p>
 
+<textarea
+  id="subscription"
+  style="width:100%;height:250px;"
+  placeholder="Push Subscription akan muncul di sini"
+  readonly>
+</textarea>
+
 <script>
   const button = document.getElementById("btnNotify");
   const status = document.getElementById("status");
@@ -79,10 +86,8 @@
           });
       }
 
-      console.log(
-        "PUSH SUBSCRIPTION:",
-        JSON.stringify(subscription)
-      );
+document.getElementById("subscription").value =
+  JSON.stringify(subscription);
 
       status.textContent =
         "✅ iPhone sudah terdaftar untuk Push Notification.";
