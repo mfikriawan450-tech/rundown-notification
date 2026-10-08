@@ -25,19 +25,24 @@
   const button = document.getElementById("btnNotify");
   const status = document.getElementById("status");
 
+  const VAPID_PUBLIC_KEY =
+    "BAVbjufsgrcrh31uDK3NsjhbRGAv70nhCNSk3rwKsrKc5oPruonYmpAUWXes3CKPWXushHcfKG97Z59_GnizQv8";
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+
+    const base64 = (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    const rawData = atob(base64);
+
+    return Uint8Array.from(
+      [...rawData].map(char => char.charCodeAt(0))
+    );
+  }
+
   async function aktifkanNotifikasi() {
-
-    if (!("serviceWorker" in navigator)) {
-      status.textContent =
-        "❌ Service Worker tidak didukung.";
-      return;
-    }
-
-    if (!("Notification" in window)) {
-      status.textContent =
-        "❌ Notifikasi tidak didukung.";
-      return;
-    }
 
     try {
 
@@ -46,40 +51,52 @@
           "./service-worker.js"
         );
 
-      console.log(
-        "Service Worker aktif:",
-        registration
-      );
+      await navigator.serviceWorker.ready;
 
       const permission =
         await Notification.requestPermission();
 
-      if (permission === "granted") {
-
+      if (permission !== "granted") {
         status.textContent =
-          "✅ Notifikasi sudah diizinkan.";
-
-        alert(
-          "Notifikasi berhasil diaktifkan!"
-        );
-
-      } else if (permission === "denied") {
-
-        status.textContent =
-          "❌ Notifikasi ditolak.";
-
-      } else {
-
-        status.textContent =
-          "⚠️ Izin notifikasi belum diberikan.";
+          "❌ Izin notifikasi belum diberikan.";
+        return;
       }
+
+      let subscription =
+        await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+
+        subscription =
+          await registration.pushManager.subscribe({
+
+            userVisibleOnly: true,
+
+            applicationServerKey:
+              urlBase64ToUint8Array(
+                VAPID_PUBLIC_KEY
+              )
+          });
+      }
+
+      console.log(
+        "PUSH SUBSCRIPTION:",
+        JSON.stringify(subscription)
+      );
+
+      status.textContent =
+        "✅ iPhone sudah terdaftar untuk Push Notification.";
+
+      alert(
+        "Berhasil! iPhone sudah terdaftar."
+      );
 
     } catch (error) {
 
       console.error(error);
 
       status.textContent =
-        "❌ Terjadi error: " + error.message;
+        "❌ Error: " + error.message;
     }
   }
 
@@ -88,5 +105,6 @@
     aktifkanNotifikasi
   );
 </script>
+  
 </body>
 </html>
